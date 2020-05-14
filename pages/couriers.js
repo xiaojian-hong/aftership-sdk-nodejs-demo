@@ -14,6 +14,10 @@ const Couriers = () => {
 		if (key) {
 			setApiKey(key);
 		}
+		const trcNumber = localStorage.getItem("trackingNumber")
+		if(trcNumber){
+			setTrackingNumber(trcNumber)
+		}
 	}, []);
 
 	const handleChangeApiKey = (e) => {
@@ -27,7 +31,6 @@ const Couriers = () => {
 			alert('Please enter your API key first');
 			return;
 		}
-
 		const aftership = new AfterShip(apiKey);
 		aftership.courier
 			.listCouriers()
@@ -59,6 +62,7 @@ const Couriers = () => {
 	const handleChangeTrackingNumber = (e) => {
 		const val = e.target.value;
 		setTrackingNumber(val);
+		localStorage.setItem('trackingNumber', val);
 	};
 
 	const handleDetectCouriers = (e) => {
@@ -118,7 +122,7 @@ const Couriers = () => {
 						</a>
 						<ul>
 							{couriers.map((item) => (
-								<li>{item.name}</li>
+								<li key={item.slug}>{item.name}</li>
 							))}
 						</ul>
 					</div>
@@ -128,7 +132,7 @@ const Couriers = () => {
 						</a>
 						<ul>
 							{allCouriers.map((item) => (
-								<li>{item.name}</li>
+								<li key={item.slug}>{item.name}</li>
 							))}
 						</ul>
 					</div>
@@ -146,7 +150,7 @@ const Couriers = () => {
 						</div>
 						<ul>
 							{detectCouriers.map((item) => (
-								<li>{item.name}</li>
+								<li key={item.slug}>{item.name}</li>
 							))}
 						</ul>
 					</div>
