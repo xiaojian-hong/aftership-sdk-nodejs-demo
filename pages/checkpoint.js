@@ -1,302 +1,307 @@
-import Head from "next/head";
-import { useState, useEffect } from "react";
-import { AfterShip } from "aftership";
+import Head from 'next/head';
+import { useState, useEffect } from 'react';
+import { AfterShip } from 'aftership';
 
 const checkpoint = () => {
-  const [apiKey, setApiKey] = useState("");
-  const [checkpointData, setCheckpointData] = useState({});
-  const [fields, setFields] = useState("");
-  const [lang, setLang] = useState("");
-  const [trackingNumber, setTrackingNumber] = useState("");
-  const [slug, setSlug] = useState("");
-  useEffect(() => {
-    const key = localStorage.getItem("apiKey");
-    if (key) {
-      setApiKey(key);
-    }
-    const trcNumber = localStorage.getItem("trackingNumber");
-    if (trcNumber) {
-      setTrackingNumber(trcNumber);
-    }
-    const slugs = localStorage.getItem("slug");
-    if (slugs) {
-      setSlug(slugs);
-    }
-  }, []);
+	const [apiKey, setApiKey] = useState('');
+	const [checkpointData, setCheckpointData] = useState({});
+	const [fields, setFields] = useState('');
+	const [lang, setLang] = useState('');
+	const [trackingNumber, setTrackingNumber] = useState('');
+  const [slug, setSlug] = useState('');
+  
+	useEffect(() => {
+		const key = localStorage.getItem('apiKey');
+		if (key) {
+			setApiKey(key);
+		}
+		const trcNumber = localStorage.getItem('trackingNumber');
+		if (trcNumber) {
+			setTrackingNumber(trcNumber);
+		}
+		const slugs = localStorage.getItem('slug');
+		if (slugs) {
+			setSlug(slugs);
+		}
+	}, []);
 
-  const handleChangeApiKey = (e) => {
-    const val = e.target.value;
-    setApiKey(val);
-    localStorage.setItem("apiKey", val);
+	const handleChangeApiKey = (e) => {
+		const val = e.target.value;
+		setApiKey(val);
+		localStorage.setItem('apiKey', val);
   };
-  const handleChangeTrackingNumber = (e) => {
-    const val = e.target.value;
-    setTrackingNumber(val);
-    localStorage.setItem("trackingNumber", val);
+  
+	const handleChangeTrackingNumber = (e) => {
+		const val = e.target.value;
+		setTrackingNumber(val);
+		localStorage.setItem('trackingNumber', val);
+	};
+
+	const handleSetSlug = (e) => {
+		const val = e.target.value;
+		setSlug(val);
+		localStorage.setItem('slug', val);
+	};
+
+	const handleSetLang = (e) => {
+		const val = e.target.value;
+		setLang(val);
+	};
+
+	const handleSetFields = (e) => {
+		const val = e.target.value;
+		setFields(val);
+	};
+
+	const handleGetLastCheckpoint = (e) => {
+		if (!apiKey) {
+			alert('Please enter your API key first');
+			return;
+		}
+		if (!slug) {
+			alert('Please enter the slug');
+			return;
+		}
+		if (!trackingNumber) {
+			alert('Please enter the trackingNumber');
+			return;
+		}
+
+		const	aftership = new AfterShip(apiKey);
+
+		aftership.last_checkpoint
+			.getLastCheckpoint(
+				{
+					slug: slug,
+					tracking_number: trackingNumber,
+				},
+				fields,
+				lang
+			)
+			.then((result) => {
+				setCheckpointData(result.checkpoint);
+			})
+			.catch((e) => alert(e.message));
   };
+  
+	return (
+		<div className='container'>
+			<Head>
+				<title>Last Checkpoint </title>
+				<link rel='icon' href='/favicon.ico' />
+			</Head>
 
-  const handleSetSlug = (e) => {
-    const val = e.target.value;
-    setSlug(val);
-    localStorage.setItem("slug", val);
-  };
+			<main>
+				<h1 className='title'>Last Checkpoint</h1>
 
-  const handleSetLang = (e) => {
-    const val = e.target.value;
-    setLang(val);
-  };
+				<p className='description'>
+					Get tracking information of the last checkpoint of a tracking.
+				</p>
 
-  const handleSetFields = (e) => {
-    const val = e.target.value;
-    setFields(val);
-  };
+				<div>
+					<input
+						type='text'
+						placeholder='API key'
+						className='api-key'
+						defaultValue={apiKey}
+						onChange={handleChangeApiKey}
+					/>
+				</div>
 
-  const handleGetCheckpointData = (e) => {
-    if (!apiKey) {
-      alert("Please enter your API key first");
-      return;
-    }
-    if (!slug) {
-      alert("Please enter the slug");
-      return;
-    }
-    if (!trackingNumber) {
-      alert("Please enter the trackingNumber");
-      return;
-    }
-    const aftership = new AfterShip(apiKey);
-    aftership.last_checkpoint
-      .getLastCheckpoint(
-        {
-          slug: slug,
-          tracking_number: trackingNumber,
-        },
-        fields,
-        lang
-      )
-      .then((result) => {
-        setCheckpointData(result.checkpoint);
-      })
-      .catch((e) => alert(e.message));
-  };
-  return (
-    <div className="container">
-      <Head>
-        <title>Last Checkpoint </title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+				<div className='resource'>
+					<div className='card'>
+						<a onClick={handleGetLastCheckpoint}>
+							<code>GET /last_checkpoint/:slug/:tracking_number</code>
+						</a>
+						<div>Required parameters</div>
+						<div className='fields'>
+							<input
+								type='text'
+								placeholder='slug'
+								defaultValue={slug}
+								onChange={handleSetSlug}
+							/>
+						</div>
+						<div className='fields'>
+							<input
+								type='text'
+								placeholder='tracking number'
+								defaultValue={trackingNumber}
+								onChange={handleChangeTrackingNumber}
+							/>
+						</div>
+						<div>optional parameters</div>
+						<div className='fields'>
+							<input
+								type='text'
+								placeholder='Example: city,tag'
+								onChange={handleSetFields}
+							/>
+						</div>
+						<div className='fields'>
+							<input
+								type='text'
+								placeholder='Example: en'
+								onChange={handleSetLang}
+							/>
+						</div>
+						{Object.keys(checkpointData).map((key) => (
+							<div key={key}>
+								{key}:{JSON.stringify(checkpointData[key])}
+							</div>
+						))}
+					</div>
+				</div>
+			</main>
 
-      <main>
-        <h1 className="title">Last Checkpoint</h1>
+			<footer>
+				<a
+					href='https://zeit.co?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app'
+					target='_blank'
+					rel='noopener noreferrer'
+				>
+					Powered by <img src='/zeit.svg' alt='ZEIT Logo' />
+				</a>
+			</footer>
 
-        <p className="description">
-          Get tracking information of the last checkpoint of a tracking.
-        </p>
+			<style jsx>{`
+				.container {
+					min-height: 100vh;
+					padding: 0 0.5rem;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+				}
 
-        <div>
-          <input
-            type="text"
-            placeholder="API key"
-            className="api-key"
-            defaultValue={apiKey}
-            onChange={handleChangeApiKey}
-          />
-        </div>
+				main {
+					padding: 5rem 0;
+					flex: 1;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+				}
 
-        <div className="resource">
-          <div className="card">
-            <a onClick={handleGetCheckpointData}>
-              <code>GET /last_checkpoint/:slug/:tracking_number</code>
-            </a>
-            <div>Required parameters</div>
-            <div className="fields">
-              <input
-                type="text"
-                placeholder="slug"
-                defaultValue={slug}
-                onChange={handleSetSlug}
-              />
-            </div>
-            <div className="fields">
-              <input
-                type="text"
-                placeholder="tracking number"
-                defaultValue={trackingNumber}
-                onChange={handleChangeTrackingNumber}
-              />
-            </div>
-            <div>optional parameters</div>
-            <div className="fields">
-              <input
-                type="text"
-                placeholder="Example: city,tag"
-                onChange={handleSetFields}
-              />
-            </div>
-            <div className="fields">
-              <input
-                type="text"
-                placeholder="Example: en"
-                onChange={handleSetLang}
-              />
-            </div>
-            {Object.keys(checkpointData).map((key) => (
-              <div key={key}>
-                {key}:{JSON.stringify(checkpointData[key])}
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
+				footer {
+					width: 100%;
+					height: 100px;
+					border-top: 1px solid #eaeaea;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+				}
 
-      <footer>
-        <a
-          href="https://zeit.co?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by <img src="/zeit.svg" alt="ZEIT Logo" />
-        </a>
-      </footer>
+				footer img {
+					margin-left: 0.5rem;
+				}
 
-      <style jsx>{`
-        .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
+				footer a {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+				}
 
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
+				a {
+					color: inherit;
+					text-decoration: none;
+				}
 
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
+				.title a {
+					color: #0070f3;
+					text-decoration: none;
+				}
 
-        footer img {
-          margin-left: 0.5rem;
-        }
+				.title a:hover,
+				.title a:focus,
+				.title a:active {
+					text-decoration: underline;
+				}
 
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
+				.title {
+					margin: 0;
+					line-height: 1.15;
+					font-size: 3rem;
+				}
 
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
+				.title,
+				.description {
+					text-align: center;
+				}
 
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
+				.description {
+					line-height: 1.5;
+					font-size: 1.5rem;
+				}
 
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
+				input {
+					padding: 5px;
+					font-size: 1rem;
+				}
 
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 3rem;
-        }
+				input.api-key {
+					width: 300px;
+				}
 
-        .title,
-        .description {
-          text-align: center;
-        }
+				code {
+					display: block;
+					background: #fafafa;
+					border-radius: 5px;
+					padding: 0.75rem;
+					font-size: 1.1rem;
+					font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
+						DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+				}
 
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
+				.resource {
+					display: flex;
+					align-items: flex-start;
+					justify-content: flex-start;
+					flex-direction: column;
+					flex-wrap: wrap;
+					max-width: 800px;
+					margin-top: 3rem;
+				}
 
-        input {
-          padding: 5px;
-          font-size: 1rem;
-        }
+				.card {
+					margin: 1rem;
+					text-align: left;
+				}
 
-        input.api-key {
-          width: 300px;
-        }
+				.card a:hover {
+					cursor: pointer;
+				}
 
-        code {
-          display: block;
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
+				.fields {
+					display: block;
+					padding: 10px 0;
+					margin: 10px 0;
+				}
 
-        .resource {
-          display: flex;
-          align-items: flex-start;
-          justify-content: flex-start;
-          flex-direction: column;
-          flex-wrap: wrap;
-          max-width: 800px;
-          margin-top: 3rem;
-        }
+				@media (max-width: 600px) {
+					.grid {
+						width: 100%;
+						flex-direction: column;
+					}
+				}
+			`}</style>
 
-        .card {
-          margin: 1rem;
-          text-align: left;
-        }
+			<style jsx global>{`
+				html,
+				body {
+					padding: 0;
+					margin: 0;
+					font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+						Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+						sans-serif;
+				}
 
-        .card a:hover {
-          cursor: pointer;
-        }
-
-        .fields {
-          display: block;
-          padding: 10px 0;
-          margin: 10px 0;
-        }
-
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
-            flex-direction: column;
-          }
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
-
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
-  );
+				* {
+					box-sizing: border-box;
+				}
+			`}</style>
+		</div>
+	);
 };
 
 export default checkpoint;

@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { AfterShip } from 'aftership';
 
 const Couriers = () => {
@@ -14,9 +14,9 @@ const Couriers = () => {
 		if (key) {
 			setApiKey(key);
 		}
-		const trcNumber = localStorage.getItem("trackingNumber")
-		if(trcNumber){
-			setTrackingNumber(trcNumber)
+		const trcNumber = localStorage.getItem('trackingNumber');
+		if (trcNumber) {
+			setTrackingNumber(trcNumber);
 		}
 	}, []);
 
@@ -26,11 +26,18 @@ const Couriers = () => {
 		localStorage.setItem('apiKey', val);
 	};
 
-	const handleListCouriers = (e) => {
+	const handleChangeTrackingNumber = (e) => {
+		const val = e.target.value;
+		setTrackingNumber(val);
+		localStorage.setItem('trackingNumber', val);
+	};
+
+	const handleListCouriers = () => {
 		if (!apiKey) {
 			alert('Please enter your API key first');
 			return;
 		}
+
 		const aftership = new AfterShip(apiKey);
 		aftership.courier
 			.listCouriers()
@@ -42,7 +49,7 @@ const Couriers = () => {
 			});
 	};
 
-	const handleListAllCouriers = (e) => {
+	const handleListAllCouriers = () => {
 		if (!apiKey) {
 			alert('Please enter your API key first');
 			return;
@@ -59,13 +66,7 @@ const Couriers = () => {
 			});
 	};
 
-	const handleChangeTrackingNumber = (e) => {
-		const val = e.target.value;
-		setTrackingNumber(val);
-		localStorage.setItem('trackingNumber', val);
-	};
-
-	const handleDetectCouriers = (e) => {
+	const handleDetectCouriers = () => {
 		if (!apiKey) {
 			alert('Please enter your API key first');
 			return;
