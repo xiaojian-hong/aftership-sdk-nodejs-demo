@@ -1,10 +1,16 @@
 # aftership-sdk-nodejs-demo
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/zeit/next.js/tree/canary/packages/create-next-app).
+This is a demo project for [aftership-sdk-nodejs](https://github.com/AfterShip/aftership-sdk-nodejs), it contains the examples how to use `aftership-sdk-nodejs` on a frontend project.
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies
+
+```bash
+yarn
+```
+
+Run the development server:
 
 ```bash
 npm run dev
